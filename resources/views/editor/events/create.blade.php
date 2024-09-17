@@ -185,6 +185,7 @@
                             success:function ($msg) {
                                 $('#district_id').html(msg);
                             },
+
                             error: function (data) {
                                 console.log('error', data)
                             }
