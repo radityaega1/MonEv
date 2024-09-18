@@ -31,9 +31,13 @@ class EventController extends Controller {
     }
 
     public function getKabupaten($id) {
-        $kabupaten   = District::all();
-        dd($kabupaten);
-//        return response()->json($kabupaten);
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        // Ambil distrik berdasarkan ID provinsi
+        $districts   = District::where('province_id', $id)->get();
+        // Kembalikan sebagai JSON
+        return response()->json($districts);
     }
 
     /** Store a newly created resource in storage. */

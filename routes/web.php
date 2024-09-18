@@ -8,7 +8,6 @@ use App\Http\Controllers\EventShowController;
 use App\Http\Controllers\LocalizationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StoreCommentController;
-use App\Models\Province;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,11 +27,14 @@ Route::middleware('auth')->group(function () {
     Route::get('event/{id}', EventShowController::class)->name('eventShow');
     Route::get('calendar', CalendarController::class)->name('calendar');
 
-    Route::get('/provinces/{province}', function (Province $province) {
-        return response()->json($province->districts);
-    });
+//    Route::get('/provinces/{province}', function (Province $province) {
+//        return response()->json($province->districts);
+//    });
+//    Route::get('getKabupaten/{province}', [EventController::class, 'getKabupaten']);
 
-    Route::get('getKabupaten', [EventController::class, 'getKabupaten']);
+    // Rute untuk mengambil kabupaten berdasarkan provinsi
+    Route::get('/getKabupaten/{id}', [EventController::class, 'getKabupaten'])->middleware('getKabupaten');
+
     Route::get('dashboard/{locale}', [LocalizationController::class, 'index'])->name('localization.index');
 
     Route::post('events/{id}/comments', StoreCommentController::class)->name('events.comments');

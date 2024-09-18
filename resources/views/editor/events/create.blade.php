@@ -9,18 +9,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl sm:px-6 lg:px-8">
-            <form method="POST" action="{{ route('editor.events.store') }}"
-{{--                  x-data="{--}}
-{{--                    province: null,--}}
-{{--                    district: null,--}}
-{{--                    districts: [],--}}
-{{--                    onProvinceChange(event) {--}}
-{{--                        axios.get(`/provinces/${event.target.value}`).then(res => {--}}
-{{--                            this.districts = res.data--}}
-{{--                        })--}}
-{{--                    }--}}
-{{--                  }" enctype="multipart/form-data"--}}
-                  class="p-4 bg-white dark:bg-gray-800 rounded-md">
+            <form method="POST" action="{{ route('editor.events.store') }}" class="p-4 bg-white dark:bg-gray-800 rounded-md">
                 @csrf
                 <div class="grid gap-6 mb-6 md:grid-cols-2">
                     <div>
@@ -53,9 +42,7 @@
                         <label for="district_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             {{__('lang.district')}}
                         </label>
-                        <select id="district_id" name="district_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 form-select input">
-
-                        </select>
+                        <select id="district_id" name="district_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 form-select input"></select>
                         @error('district_id')
                         <div class="text-sm text-red-400">{{ $message }}</div>
                         @enderror
@@ -161,54 +148,42 @@
                 </div>
             </form>
         </div>
-        <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
         <script>
             document.getElementById('start_date').min = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
             document.getElementById('end_date').min = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
             document.getElementById('start_date').addEventListener('change', function() {
                 document.getElementById('end_date').min = this.value;
             });
-            $(function () {
-                $.ajaxSetup({
-                    header: {'X-CSRF-TOKEN': $('meta[name="csrf-token]').attr('content')}
-                })
-                $(function() {
-                    $('#province_id').on('change', function () {
-                        let idProvinsi = $('#province_id').val();
-                        console.log(idProvinsi);
-                        $.ajax({
-                            type  : 'GET',
-                            url   : 'getKabupaten' + id,
-                            data  : {province_id: idProvinsi},
-                            cache : false,
 
-                            success:function ($msg) {
-                                $('#district_id').html(msg);
-                            },
-
-                            error: function (data) {
-                                console.log('error', data)
-                            }
-
-                        })
-                    })
-                })
-            })
             $(document).ready(function() {
-                $('#province_id').on('change', function() {
-                    var id = $(this).val();
-                    if(id) {
-                        console.log(id);
-                        $.ajax({
-                            url: '/getKabupaten/' + id,
-                            dataType: 'json',
-                            success: function (data) {
-                                console.log(data)
-                            }
-                        })
+                // Set up CSRF token for AJAX requests
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
                 });
-            })
+
+                $('#province_id').on('change', function() {
+                    var provinceId = $(this).val();
+                    $('#district_id').empty().append('<option value="">-- Select District --</option>');
+
+                    console.log(provinceId)
+                    if (provinceId) {
+                        $.ajax({
+                            url: '/getKabupaten/' + provinceId,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function(data) {
+                                $.each(data, function(id, district) {
+                                    $('#district_id').append('<option value="' + district.id + '">' + district.name + '</option>');
+                                });
+                            }, error: function(xhr) {
+                                console.log('Error fetching districts:', xhr.status, xhr.statusText);
+                            }
+                        });
+                    }
+                });
+            });
         </script>
     </div>
 </x-editor-app-layout>

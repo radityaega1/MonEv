@@ -29,11 +29,15 @@ Route::middleware('auth:editor')->prefix('editor')->name('editor.')->group(funct
     Route::get('event', EditorEventIndexController::class)
         ->name('eventIndex');
 
-    Route::get('/provinces/{province}', function (Province $province) {
-        return response()->json($province->districts);
-    });
+//    Route::get('/provinces/{province}', function (Province $province) {
+//        return response()->json($province->districts);
+//    });
 
-    Route::get('getKabupaten/{id}', [EventController::class, 'getKabupaten']);
+//    Route::get('getKabupaten/{province}', [EventController::class, 'getKabupaten']);
+
+    // Rute untuk mengambil kabupaten berdasarkan provinsi
+    Route::get('/getKabupaten/{id}', [EventController::class, 'getKabupaten'])->middleware('getKabupaten');
+
     Route::get('lang/{locale}', [LocalizationController::class, 'index'])->name('localization.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])
